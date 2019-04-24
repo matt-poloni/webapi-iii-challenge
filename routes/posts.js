@@ -10,4 +10,13 @@ router.get('/', (req, res) => {
     .catch(err => res.status(500).json({ error: 'The posts data could not be retrieved.' }))
 })
 
+router.post('/', (req, res) => {
+  const newPost = req.body;
+  !newPost.text || !newPost.user_id
+    ? res.status(400).json({ error: 'Please provide text and a user_id for the new post.' })
+    : db.insert(newPost)
+        .then(inserted => res.status(201).json(inserted))
+        .catch(err => res.status(500).json({ error: 'There was an error while creating the new post.' }))
+})
+
 module.exports = router;
