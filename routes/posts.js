@@ -1,6 +1,7 @@
 const express = require('express');
 
 const db = require('../data/helpers/postDb');
+const dbUsers = require('../data/helpers/userDb');
 
 const router = express.Router();
 
@@ -10,13 +11,15 @@ router.get('/', (req, res) => {
     .catch(err => res.status(500).json({ error: 'The posts data could not be retrieved.' }))
 })
 
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   const newPost = req.body;
   !newPost.text || !newPost.user_id
     ? res.status(400).json({ error: 'Please provide text and a user_id for the new post.' })
-    : db.insert(newPost)
-        .then(inserted => res.status(201).json(inserted))
-        .catch(err => res.status(500).json({ error: 'There was an error while creating the new post.' }))
+    : await dbUsers.getById(newPost.user_id)
+      ? db.insert(newPost)
+          .then(inserted => res.status(201).json(inserted))
+          .catch(err => res.status(500).json({ error: 'There was an error while creating the new post.' }))
+      : res.status(400).json({ error: 'Please provide a valid user_id.' })
 })
 
 router.get('/:id', (req, res) => {
