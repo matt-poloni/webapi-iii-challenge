@@ -14,7 +14,9 @@ const hasName = (req, res, next) => {
 
 const nameUpperCase = (req, res, next) => {
   // Best used after hasName
-  req.body.name = req.body.name.toUpperCase();
+  req.body.name = req.body.name
+    .split(' ').map(name => `${name[0].toUpperCase()}${name.slice(1)}`)
+    .join(' ');
   next();
 }
 
