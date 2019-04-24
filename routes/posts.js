@@ -22,7 +22,7 @@ const hasUserID = (req, res, next) => {
 const validUserID = async (req, res, next) => {
   const invalid = await dbUsers.getById(req.body.user_id);
   !invalid
-    ? res.status(400).json({ error: 'Please provide a valid user_id.' })
+    ? res.status(400).json({ error: 'The specified user_id does not exist. Please provide a valid user_id.' })
     : next();
 }
 
