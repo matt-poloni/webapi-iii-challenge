@@ -26,4 +26,15 @@ router.post('/', nameUpperCase, (req, res) => {
         .catch(err => res.status(500).json({ error: 'There was an error while creating the new user.' }))
 })
 
+router.get('/:id', (req, res) => {
+  const userID = req.params.id;
+  db.getById(userID)
+    .then(user => {
+      !user
+        ? res.status(404).json({ error: 'The user with the specified ID does not exist.' })
+        : res.status(200).json(user);
+    })
+    .catch(err => res.status(500).json({ error: 'The user information could not be retrieved' }))
+})
+
 module.exports = router;
