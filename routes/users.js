@@ -4,6 +4,12 @@ const db = require('../data/helpers/userDb');
 
 const router = express.Router();
 
+const hasName = (req, res, next) => {
+  !req.body.name
+    ? res.status(400).json({ error: 'Please provide a name for the user.' })
+    : next();
+}
+
 const nameUpperCase = (req, res, next) => {
   if(req.body.name) {
     req.body.name = req.body.name.toUpperCase();
@@ -17,13 +23,11 @@ router.get('/', (req, res) => {
     .catch(err => res.status(500).json({ error: 'The users data could not be retrieved.' }))
 })
 
-router.post('/', nameUpperCase, (req, res) => {
+router.post('/', hasName, nameUpperCase, (req, res) => {
   const newUser = req.body;
-  !newUser.name
-    ? res.status(400).json({ error: 'Please provide a name for the new user.' })
-    : db.insert(newUser)
-        .then(inserted => res.status(201).json(inserted))
-        .catch(err => res.status(500).json({ error: 'There was an error while creating the new user.' }))
+  db.insert(newUser)
+    .then(inserted => res.status(201).json(inserted))
+    .catch(err => res.status(500).json({ error: 'There was an error while creating the new user.' }))
 })
 
 router.get('/:id', (req, res) => {
@@ -37,19 +41,17 @@ router.get('/:id', (req, res) => {
     .catch(err => res.status(500).json({ error: 'The user information could not be retrieved' }))
 })
 
-router.put('/:id', nameUpperCase, (req, res) => {
+router.put('/:id', hasName, nameUpperCase, (req, res) => {
   const newUser = req.body;
   const userID = req.params.id;
-  !newUser.name
-    ? res.status(400).json({ error: 'Please provide a name for the user you wish to update.' })
-    : db.update(userID, newUser)
-        .then(async count => {
-          const updated = await db.getById(userID);
-          !count
-            ? res.status(404).json({ error: 'The user with the specified ID does not exist.' })
-            : res.status(200).json(updated);
-        })
-        .catch(err => res.status(500).json({ error: 'The user information could not be modified.' }))
+  db.update(userID, newUser)
+    .then(async count => {
+      const updated = await db.getById(userID);
+      !count
+        ? res.status(404).json({ error: 'The user with the specified ID does not exist.' })
+        : res.status(200).json(updated);
+    })
+    .catch(err => res.status(500).json({ error: 'The user information could not be modified.' }))
 })
 
 router.delete('/:id', async (req, res) => {
