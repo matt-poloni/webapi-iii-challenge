@@ -23,9 +23,9 @@ router.get('/', (req, res) => {
     .catch(err => res.status(500).json({ error: 'The posts data could not be retrieved.' }))
 })
 
-router.post('/', hasText, hasUserID, async (req, res) => {
+router.post('/', hasText, hasUserID, (req, res) => {
   const newPost = req.body;
-  await !dbUsers.getById(newPost.user_id)
+  !dbUsers.getById(newPost.user_id)
     ? res.status(400).json({ error: 'Please provide a valid user_id.' })
     : db.insert(newPost)
         .then(inserted => res.status(201).json(inserted))
@@ -43,10 +43,10 @@ router.get('/:id', (req, res) => {
     .catch(err => res.status(500).json({ error: 'The post information could not be retrieved' }))
 })
 
-router.put('/:id', hasText, hasUserID, async (req, res) => {
+router.put('/:id', hasText, hasUserID, (req, res) => {
   const newPost = req.body;
   const postID = req.params.id;
-  await !dbUsers.getById(newPost.user_id)
+  !dbUsers.getById(newPost.user_id)
     ? res.status(400).json({ error: 'Please provide a valid user_id.' })
     : db.update(postID, newPost)
       .then(async count => {
