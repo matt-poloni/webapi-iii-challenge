@@ -64,4 +64,17 @@ router.delete('/:id', async (req, res) => {
     .catch(err => res.status(500).json({ error: 'The user could not be removed.' }));
 })
 
+router.get('/:id/posts', (req, res) => {
+  const userID = req.params.id;
+  db.getUserPosts(userID)
+    .then(posts => {
+      !posts
+        ? res.status(404).json({ error: 'The user with the specified ID does not exist.' })
+        : !posts.length
+          ? res.status(404).json({ error: 'The specified user has no posts in our database.' })
+          : res.status(200).json(posts);
+    })
+    .catch(err => res.status(500).json({ error: 'The user information could not be retrieved' }))
+})
+
 module.exports = router;
