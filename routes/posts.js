@@ -15,11 +15,11 @@ router.post('/', async (req, res) => {
   const newPost = req.body;
   !newPost.text || !newPost.user_id
     ? res.status(400).json({ error: 'Please provide text and a user_id for the new post.' })
-    : await dbUsers.getById(newPost.user_id)
-      ? db.insert(newPost)
+    : await !dbUsers.getById(newPost.user_id)
+      ? res.status(400).json({ error: 'Please provide a valid user_id.' })
+      : db.insert(newPost)
           .then(inserted => res.status(201).json(inserted))
           .catch(err => res.status(500).json({ error: 'There was an error while creating the new post.' }))
-      : res.status(400).json({ error: 'Please provide a valid user_id.' })
 })
 
 router.get('/:id', (req, res) => {
@@ -31,6 +31,24 @@ router.get('/:id', (req, res) => {
         : res.status(200).json(post);
     })
     .catch(err => res.status(500).json({ error: 'The post information could not be retrieved' }))
+})
+
+router.put('/:id', async (req, res) => {
+  const newPost = req.body;
+  const postID = req.params.id;
+  !newPost.text || !newPost.user_id
+    ? res.status(400).json({ error: 'Please provide text and a user_id for the post you wish to update.' })
+    : await !dbUsers.getById(newPost.user_id)
+      ? res.status(400).json({ error: 'Please provide a valid user_id.' })
+      : db.update(postID, newPost)
+        .then(async count => {
+          console.log(count)
+          const updated = await db.getById(postID);
+          !count
+            ? res.status(404).json({ error: 'The post with the specified ID does not exist.' })
+            : res.status(200).json(updated);
+        })
+        .catch(err => res.status(500).json({ error: 'The post information could not be modified.' }))
 })
 
 module.exports = router;
