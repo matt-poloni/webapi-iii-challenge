@@ -4,6 +4,8 @@ const db = require('../data/helpers/userDb');
 
 const router = express.Router();
 
+// CUSTOM MIDDLEWARE
+
 const hasName = (req, res, next) => {
   !req.body.name
     ? res.status(400).json({ error: 'Please provide a name for the user.' })
@@ -16,6 +18,8 @@ const nameUpperCase = (req, res, next) => {
   }
   next();
 }
+
+// ENDPOINTS
 
 router.get('/', (req, res) => {
   db.get()

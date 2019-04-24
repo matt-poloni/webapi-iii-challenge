@@ -5,6 +5,8 @@ const dbUsers = require('../data/helpers/userDb');
 
 const router = express.Router();
 
+// CUSTOM MIDDLEWARE
+
 const hasText = (req, res, next) => {
   !req.body.text
     ? res.status(400).json({ error: 'Please provide text for the post.' })
@@ -23,6 +25,8 @@ const validUserID = async (req, res, next) => {
     ? res.status(400).json({ error: 'Please provide a valid user_id.' })
     : next();
 }
+
+// ENDPOINTS
 
 router.get('/', (req, res) => {
   db.get()
