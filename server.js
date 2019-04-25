@@ -10,7 +10,7 @@ server.use(express.json());
 server.use(cors());
 
 server.get('/', (req, res) => {
-  res.send("It's working");
+  res.send(process.env.HELLO);
 })
 
 server.use('/api/users', usersRouter);
