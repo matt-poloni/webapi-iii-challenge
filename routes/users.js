@@ -19,7 +19,6 @@ const nameUpperCase = (req, res, next) => {
 }
 
 const validID = async (req, res, next) => {
-  console.log(req.params)
   const invalid = await db.getById(req.params.id);
   !invalid
     ? res.status(400).json({ error: 'The specified user id does not exist. Please provide a valid user id.' })
@@ -57,22 +56,20 @@ router.put('/:id', hasName, nameUpperCase, (req, res) => {
   const userID = req.params.id;
   db.update(userID, newUser)
     .then(async count => {
-      const updated = await db.getById(userID);
       !count
         ? res.status(404).json({ error: 'The user with the specified ID does not exist.' })
-        : res.status(200).json(updated);
+        : res.status(200).json(await db.getById(userID));
     })
     .catch(err => res.status(500).json({ error: 'The user information could not be modified.' }))
 })
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', (req, res) => {
   const userID = req.params.id;
-  const deleted = await db.getById(userID);
   db.remove(userID)
-    .then(count => {
+    .then(async count => {
       !count
         ? res.status(404).json({ error: 'The user with the specified ID does not exist.' })
-        : res.status(200).json(deleted);
+        : res.status(200).json(await db.getById(userID));
     })
     .catch(err => res.status(500).json({ error: 'The user could not be removed.' }));
 })

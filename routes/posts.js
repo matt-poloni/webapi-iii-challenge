@@ -57,22 +57,20 @@ router.put('/:id', hasText, hasUserID, validUserID, (req, res) => {
   const postID = req.params.id;
   db.update(postID, newPost)
     .then(async count => {
-      const updated = await db.getById(postID);
       !count
         ? res.status(404).json({ error: 'The post with the specified ID does not exist.' })
-        : res.status(200).json(updated);
+        : res.status(200).json(await db.getById(postID));
     })
     .catch(err => res.status(500).json({ error: 'The post information could not be modified.' }))
 })
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', (req, res) => {
   const postID = req.params.id;
-  const deleted = await db.getById(postID);
   db.remove(postID)
-    .then(count => {
+    .then(async count => {
       !count
         ? res.status(404).json({ error: 'The post with the specified ID does not exist.' })
-        : res.status(200).json(deleted);
+        : res.status(200).json(await db.getById(postID));
     })
     .catch(err => res.status(500).json({ error: 'The post could not be removed.' }));
 })
