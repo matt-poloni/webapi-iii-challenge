@@ -14,9 +14,7 @@ const hasName = (req, res, next) => {
 
 const nameUpperCase = (req, res, next) => {
   // Best used after hasName
-  req.body.name = req.body.name
-    .split(' ').map(name => `${name[0].toUpperCase()}${name.slice(1)}`)
-    .join(' ');
+  req.body.name = req.body.name.toUpperCase();
   next();
 }
 
@@ -48,6 +46,7 @@ router.get('/:id', (req, res) => {
 
 router.put('/:id', hasName, nameUpperCase, (req, res) => {
   const newUser = req.body;
+  console.log(newUser);
   const userID = req.params.id;
   db.update(userID, newUser)
     .then(async count => {
@@ -56,7 +55,7 @@ router.put('/:id', hasName, nameUpperCase, (req, res) => {
         ? res.status(404).json({ error: 'The user with the specified ID does not exist.' })
         : res.status(200).json(updated);
     })
-    .catch(err => res.status(500).json({ error: 'The user information could not be modified.' }))
+    .catch(err => res.status(500).json({ error: 'The user information could not be modified.', err }))
 })
 
 router.delete('/:id', async (req, res) => {
