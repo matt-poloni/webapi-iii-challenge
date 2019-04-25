@@ -18,6 +18,14 @@ const nameUpperCase = (req, res, next) => {
   next();
 }
 
+const validID = async (req, res, next) => {
+  console.log(req.params)
+  const invalid = await db.getById(req.params.id);
+  !invalid
+    ? res.status(400).json({ error: 'The specified user id does not exist. Please provide a valid user id.' })
+    : next();
+}
+
 // ENDPOINTS
 
 router.get('/', (req, res) => {
@@ -46,7 +54,6 @@ router.get('/:id', (req, res) => {
 
 router.put('/:id', hasName, nameUpperCase, (req, res) => {
   const newUser = req.body;
-  console.log(newUser);
   const userID = req.params.id;
   db.update(userID, newUser)
     .then(async count => {
@@ -55,7 +62,7 @@ router.put('/:id', hasName, nameUpperCase, (req, res) => {
         ? res.status(404).json({ error: 'The user with the specified ID does not exist.' })
         : res.status(200).json(updated);
     })
-    .catch(err => res.status(500).json({ error: 'The user information could not be modified.', err }))
+    .catch(err => res.status(500).json({ error: 'The user information could not be modified.' }))
 })
 
 router.delete('/:id', async (req, res) => {
@@ -70,15 +77,13 @@ router.delete('/:id', async (req, res) => {
     .catch(err => res.status(500).json({ error: 'The user could not be removed.' }));
 })
 
-router.get('/:id/posts', (req, res) => {
+router.get('/:id/posts', validID, (req, res) => {
   const userID = req.params.id;
   db.getUserPosts(userID)
     .then(posts => {
-      !posts
-        ? res.status(404).json({ error: 'The user with the specified ID does not exist.' })
-        : !posts.length
-          ? res.status(404).json({ error: 'The specified user has no posts in our database.' })
-          : res.status(200).json(posts);
+      !posts.length
+        ? res.status(404).json({ error: 'The specified user has no posts in our database.' })
+        : res.status(200).json(posts);
     })
     .catch(err => res.status(500).json({ error: 'The user information could not be retrieved' }))
 })
